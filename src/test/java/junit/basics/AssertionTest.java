@@ -2,6 +2,8 @@ package junit.basics;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.List;
+import java.util.stream.IntStream;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
@@ -19,7 +21,7 @@ public class AssertionTest {
     }
 
     @Test
-    void assertEquals_메시지_실패_시_원인_파악용() {
+    void assertEquals_message_실패_시_원인_파악용() {
         String expected = "hello";
         String actual = "hello";
 
@@ -28,11 +30,24 @@ public class AssertionTest {
     }
 
     @Test
-    void assertEqauls_부동소수점_delta_허용_오차() {
+    void assertEqauls_delta_부동소수점_허용_오차() {
         double expected = 0.3;
         double actual = 0.1 + 0.2;
 
         // delta 없으면 실패 (부동소수점 오차)
         assertEquals(expected, actual, 0.0001);
+    }
+
+    @Test
+    void assertEquals_supplier_실패_시에만_메시지_생성() {
+        List<Integer> hugeList = IntStream.range(0, 100_000).boxed().toList();
+
+        int expected = 100_000;
+        int actual = hugeList.size();
+
+        // 메시지 생성이 무거울 때, 실패 시에만 실행되도록 지연
+        assertEquals(
+                expected, actual, () -> "리스트 전체 내용: " + hugeList // 10만개 출력
+                );
     }
 }
