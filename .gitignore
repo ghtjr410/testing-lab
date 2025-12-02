@@ -98,3 +98,6 @@ htmlcov/
 # Temporary files
 *.tmp
 *.temp
+
+# diff
+diff/
