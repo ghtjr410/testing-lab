@@ -8,6 +8,7 @@ import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.opentest4j.AssertionFailedError;
 
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 public class AssertionTest {
@@ -51,6 +52,7 @@ public class AssertionTest {
          * - float/double (delta):
          *   - 비트일치 || Math.abs(v1 - v2) <= delta
          *   - delta 검증: NaN이거나 음수면 예외
+         * - Object: obj1 == null ? obj2 == null : obj1.equals(obj2)
          * </pre>
          *
          * @see <a href="https://github.com/junit-team/junit-framework/blob/main/junit-jupiter-api/src/main/java/org/junit/jupiter/api/AssertNotEquals.java">AssertNotEquals</a>
@@ -77,6 +79,21 @@ public class AssertionTest {
         @Test
         void float_delta_허용오차_비교() {
             assertNotEquals(0.1f, 0.5f, 0.01f);
+        }
+
+        @Test
+        void Object_equals_비교() {
+            assertNotEquals("hello", "world");
+            assertNotEquals(List.of(1, 2), List.of(1, 2, 3));
+        }
+
+        @Test
+        void Object_null_비교() {
+            assertNotEquals(null, "hello");
+            assertNotEquals("hello", null);
+
+            // 둘 다 null → NPE_없이 equal 판정 → assertNotEquals 실패
+            assertThrows(AssertionFailedError.class, () -> assertNotEquals((Object) null, (Object) null));
         }
     }
 }
