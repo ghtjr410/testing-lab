@@ -48,13 +48,15 @@ public class AssertionTest {
          * - primitive (byte, short, int, long, char): == 비교
          * - float: Float.floatToIntBits(v1) == Float.floatToIntBits(v2)
          * - double: Double.doubleToLongBits(v1) == Double.doubleToLongBits(v2)
+         * - float/double (delta):
+         *   - 비트일치 || Math.abs(v1 - v2) <= delta
+         *   - delta 검증: NaN이거나 음수면 예외
          * </pre>
          *
          * @see <a href="https://github.com/junit-team/junit-framework/blob/main/junit-jupiter-api/src/main/java/org/junit/jupiter/api/AssertNotEquals.java">AssertNotEquals</a>
          */
         @Test
         void primitive_등호연산자_비교() {
-            // if (unexpected == actual) failEqual()
             assertNotEquals((byte) 1, (byte) 2);
             assertNotEquals((short) 1, (short) 2);
             assertNotEquals(1, 2);
@@ -64,20 +66,17 @@ public class AssertionTest {
 
         @Test
         void float_비트패턴_비교() {
-            // Float.floatToIntBits(v1) == Float.floatToIntBits(v2)
             assertNotEquals(0.1f, 0.2f);
-
-            // 같은 비트 패턴이면 equal → assertNotEquals 실패
-            // assertNotEquals(0.5f, 0.5f);  // 실패
         }
 
         @Test
         void double_비트패턴_비교() {
-            // Double.doubleToLongBits(v1) == Double.doubleToLongBits(v2)
             assertNotEquals(0.1, 0.2);
+        }
 
-            // 같은 비트 패턴이면 equal → assertNotEquals 실패
-            // assertNotEquals(0.5, 0.5);  // 실패
+        @Test
+        void float_delta_허용오차_비교() {
+            assertNotEquals(0.1f, 0.5f, 0.01f);
         }
     }
 }
