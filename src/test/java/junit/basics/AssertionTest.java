@@ -61,5 +61,14 @@ public class AssertionTest {
             assertNotEquals(1L, 2L);
             assertNotEquals('a', 'b');
         }
+
+        @Test
+        void float_비트패턴_비교() {
+            // Float.floatToIntBits(v1) == Float.floatToIntBits(v2)
+            assertNotEquals(0.1f, 0.2f);
+
+            // 같은 비트 패턴이면 equal → assertNotEquals 실패
+            // assertNotEquals(0.5f, 0.5f);  // 실패
+        }
     }
 }
