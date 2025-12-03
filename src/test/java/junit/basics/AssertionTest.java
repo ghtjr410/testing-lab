@@ -70,5 +70,14 @@ public class AssertionTest {
             // 같은 비트 패턴이면 equal → assertNotEquals 실패
             // assertNotEquals(0.5f, 0.5f);  // 실패
         }
+
+        @Test
+        void double_비트패턴_비교() {
+            // Double.doubleToLongBits(v1) == Double.doubleToLongBits(v2)
+            assertNotEquals(0.1, 0.2);
+
+            // 같은 비트 패턴이면 equal → assertNotEquals 실패
+            // assertNotEquals(0.5, 0.5);  // 실패
+        }
     }
 }
