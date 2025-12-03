@@ -39,4 +39,27 @@ public class AssertionTest {
             assertEquals(100_000, hugeList.size(), () -> "리스트 전체 내용: " + hugeList); // 10만개 출력
         }
     }
+
+    @Nested
+    class AssertNotEquals {
+        /**
+         * 내부 구현:
+         * <pre>
+         * - primitive (byte, short, int, long, char): == 비교
+         * - float: Float.floatToIntBits(v1) == Float.floatToIntBits(v2)
+         * - double: Double.doubleToLongBits(v1) == Double.doubleToLongBits(v2)
+         * </pre>
+         *
+         * @see <a href="https://github.com/junit-team/junit-framework/blob/main/junit-jupiter-api/src/main/java/org/junit/jupiter/api/AssertNotEquals.java">AssertNotEquals</a>
+         */
+        @Test
+        void primitive_등호연산자_비교() {
+            // if (unexpected == actual) failEqual()
+            assertNotEquals((byte) 1, (byte) 2);
+            assertNotEquals((short) 1, (short) 2);
+            assertNotEquals(1, 2);
+            assertNotEquals(1L, 2L);
+            assertNotEquals('a', 'b');
+        }
+    }
 }
