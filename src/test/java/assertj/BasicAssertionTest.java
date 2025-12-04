@@ -49,4 +49,20 @@ public class BasicAssertionTest {
             assertThat(str1).isNotSameAs(str2);
         }
     }
+
+    @Nested
+    class isNull_null_검증 {
+
+        @Test
+        void null이면_통과() {
+            String str = null;
+            assertThat(str).isNull();
+        }
+
+        @Test
+        void null이_아니면_통과() {
+            String str = "hello";
+            assertThat(str).isNotNull();
+        }
+    }
 }
