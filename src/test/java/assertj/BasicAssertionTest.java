@@ -104,4 +104,48 @@ public class BasicAssertionTest {
             assertThat("abc123").matches("[a-z]+[0-9]+");
         }
     }
+
+    @Nested
+    class 숫자_검증 {
+
+        @Test
+        void isPositive_양수() {
+            assertThat(10).isPositive();
+        }
+
+        @Test
+        void isNegative_음수() {
+            assertThat(-10).isNegative();
+        }
+
+        @Test
+        void isZero_영() {
+            assertThat(0).isZero();
+        }
+
+        @Test
+        void isGreaterThan_초과() {
+            assertThat(6).isGreaterThan(5);
+        }
+
+        @Test
+        void isGreaterThanOrEqualTo_이상() {
+            assertThat(5).isGreaterThanOrEqualTo(5);
+        }
+
+        @Test
+        void isLessThanOrEqualTo_이하() {
+            assertThat(5).isLessThanOrEqualTo(5);
+        }
+
+        @Test
+        void isLessThan_미만() {
+            assertThat(4).isLessThan(5);
+        }
+
+        @Test
+        void isBetween_범위() {
+            assertThat(5).isBetween(1, 10);
+        }
+    }
 }
