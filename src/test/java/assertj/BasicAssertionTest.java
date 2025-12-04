@@ -65,4 +65,43 @@ public class BasicAssertionTest {
             assertThat(str).isNotNull();
         }
     }
+
+    @Nested
+    class 문자열_검증 {
+
+        @Test
+        void isEmpty_빈_문자열() {
+            assertThat("").isEmpty();
+        }
+
+        @Test
+        void isNotEmpty_비어있지_않음() {
+            assertThat("hello").isNotEmpty();
+        }
+
+        @Test
+        void isBlank_공백_있는_문자열() {
+            assertThat(" ").isBlank();
+        }
+
+        @Test
+        void contains_포함_여부() {
+            assertThat("hello world").contains("world");
+        }
+
+        @Test
+        void startsWith_접두사() {
+            assertThat("hello world").startsWith("hello");
+        }
+
+        @Test
+        void endsWith_접미사() {
+            assertThat("hello world").endsWith("world");
+        }
+
+        @Test
+        void matches_정규식() {
+            assertThat("abc123").matches("[a-z]+[0-9]+");
+        }
+    }
 }
