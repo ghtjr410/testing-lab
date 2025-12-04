@@ -148,4 +148,18 @@ public class BasicAssertionTest {
             assertThat(5).isBetween(1, 10);
         }
     }
+
+    @Nested
+    class Boolean_검증 {
+
+        @Test
+        void isTrue_참() {
+            assertThat(true).isTrue();
+        }
+
+        @Test
+        void isFalse_거짓() {
+            assertThat(false).isFalse();
+        }
+    }
 }
