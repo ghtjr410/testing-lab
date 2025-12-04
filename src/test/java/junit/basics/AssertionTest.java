@@ -44,18 +44,17 @@ public class AssertionTest {
     @Nested
     class AssertNotEquals {
         /**
+         * @see AssertNotEquals 구현체
          * 내부 구현:
-         * <pre>
          * - primitive (byte, short, int, long, char): == 비교
          * - float: Float.floatToIntBits(v1) == Float.floatToIntBits(v2)
          * - double: Double.doubleToLongBits(v1) == Double.doubleToLongBits(v2)
          * - float/double (delta):
-         *   - 비트일치 || Math.abs(v1 - v2) <= delta
-         *   - delta 검증: NaN이거나 음수면 예외
+         *     - 비트일치 || Math.abs(v1 - v2) <= delta
+         *     - delta 검증: NaN이거나 음수면 예외
          * - Object: obj1 == null ? obj2 == null : obj1.equals(obj2)
-         * </pre>
          *
-         * @see <a href="https://github.com/junit-team/junit-framework/blob/main/junit-jupiter-api/src/main/java/org/junit/jupiter/api/AssertNotEquals.java">AssertNotEquals</a>
+         * 참고: https://github.com/junit-team/junit-framework/blob/main/junit-jupiter-api/src/main/java/org/junit/jupiter/api/AssertNotEquals.java
          */
         @Test
         void primitive_등호연산자_비교() {
@@ -94,6 +93,11 @@ public class AssertionTest {
 
             // 둘 다 null → NPE_없이 equal 판정 → assertNotEquals 실패
             assertThrows(AssertionFailedError.class, () -> assertNotEquals((Object) null, (Object) null));
+        }
+
+        @Test
+        void message_실패_시_원인_파악용() {
+            assertNotEquals(1, 2, "성공하면 이 메시지는 보이지 않음");
         }
     }
 }
