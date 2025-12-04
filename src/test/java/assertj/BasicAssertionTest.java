@@ -162,4 +162,20 @@ public class BasicAssertionTest {
             assertThat(false).isFalse();
         }
     }
+
+    @Nested
+    class 체이닝 {
+
+        @Test
+        void 여러_조건을_한번에_검증() {
+            String str = "hello world";
+
+            assertThat(str)
+                    .isNotNull()
+                    .isNotEmpty()
+                    .startsWith("hello")
+                    .endsWith("world")
+                    .contains(" ");
+        }
+    }
 }
