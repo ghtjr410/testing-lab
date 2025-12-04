@@ -31,4 +31,22 @@ public class BasicAssertionTest {
             assertThat(str1).isEqualTo(str2);
         }
     }
+
+    @Nested
+    class isSameAs_동일성_비교 {
+
+        @Test
+        void 같은_인스턴스면_통과() {
+            String str = "hello";
+            assertThat(str).isSameAs(str);
+        }
+
+        @Test
+        void 다른_인스턴스면_실패() {
+            String str1 = new String("test");
+            String str2 = new String("test");
+
+            assertThat(str1).isNotSameAs(str2);
+        }
+    }
 }
