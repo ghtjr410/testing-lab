@@ -90,4 +90,26 @@ public class CollectionAssertionTest {
             assertThat(list).doesNotContainNull();
         }
     }
+
+    @Nested
+    class 첫번째_마지막_요소 {
+
+        @Test
+        void first_첫번째_요소() {
+            List<String> list = List.of("a", "b", "c");
+            assertThat(list).first().isEqualTo("a");
+        }
+
+        @Test
+        void last_마지막_요소() {
+            List<String> list = List.of("a", "b", "c");
+            assertThat(list).last().isEqualTo("c");
+        }
+
+        @Test
+        void element_특정_인덱스_요소() {
+            List<String> list = List.of("a", "b", "c");
+            assertThat(list).element(1).isEqualTo("b");
+        }
+    }
 }
