@@ -3,6 +3,7 @@ package assertj;
 import static org.assertj.core.api.Assertions.*;
 
 import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Nested;
@@ -146,6 +147,17 @@ public class CollectionAssertionTest {
                     .filteredOn(user -> user.age() >= 25)
                     .extracting(User::name)
                     .containsExactly("영희", "민수");
+        }
+    }
+
+    @Nested
+    class Set_검증 {
+
+        @Test
+        void Set도_동일하게_사용() {
+            Set<String> set = Set.of("a", "b", "c");
+
+            assertThat(set).hasSize(3).contains("a", "b");
         }
     }
 }
