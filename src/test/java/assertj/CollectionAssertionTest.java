@@ -3,6 +3,7 @@ package assertj;
 import static org.assertj.core.api.Assertions.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
@@ -158,6 +159,34 @@ public class CollectionAssertionTest {
             Set<String> set = Set.of("a", "b", "c");
 
             assertThat(set).hasSize(3).contains("a", "b");
+        }
+    }
+
+    @Nested
+    class Map_검증 {
+
+        @Test
+        void containsKey_키_포함() {
+            Map<String, Integer> map = Map.of("a", 1, "b", 2);
+            assertThat(map).containsKey("a");
+        }
+
+        @Test
+        void containsValue_값_포함() {
+            Map<String, Integer> map = Map.of("a", 1, "b", 2);
+            assertThat(map).containsValue(1);
+        }
+
+        @Test
+        void containsEntry_키값_쌍_포함() {
+            Map<String, Integer> map = Map.of("a", 1, "b", 2);
+            assertThat(map).containsEntry("a", 1);
+        }
+
+        @Test
+        void doesNotContainKey_키_미포함() {
+            Map<String, Integer> map = Map.of("a", 1, "b", 2);
+            assertThat(map).doesNotContainKey("c");
         }
     }
 }
