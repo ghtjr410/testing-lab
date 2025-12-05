@@ -132,4 +132,20 @@ public class CollectionAssertionTest {
             assertThat(users).extracting(User::name, User::age).containsExactly(tuple("철수", 20), tuple("영희", 25));
         }
     }
+
+    @Nested
+    class filteredOn_필터링 {
+
+        record User(String name, int age) {}
+
+        @Test
+        void 조건으로_필터링_후_검증() {
+            List<User> users = List.of(new User("철수", 20), new User("영희", 25), new User("민수", 30));
+
+            assertThat(users)
+                    .filteredOn(user -> user.age() >= 25)
+                    .extracting(User::name)
+                    .containsExactly("영희", "민수");
+        }
+    }
 }
