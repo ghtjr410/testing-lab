@@ -112,4 +112,24 @@ public class CollectionAssertionTest {
             assertThat(list).element(1).isEqualTo("b");
         }
     }
+
+    @Nested
+    class extracting_필드_추출 {
+
+        record User(String name, int age) {}
+
+        @Test
+        void 단일_필드_추출() {
+            List<User> users = List.of(new User("철수", 20), new User("영희", 25));
+
+            assertThat(users).extracting(User::name).containsExactly("철수", "영희");
+        }
+
+        @Test
+        void 여러_필드_추출() {
+            List<User> users = List.of(new User("철수", 20), new User("영희", 25));
+
+            assertThat(users).extracting(User::name, User::age).containsExactly(tuple("철수", 20), tuple("영희", 25));
+        }
+    }
 }
