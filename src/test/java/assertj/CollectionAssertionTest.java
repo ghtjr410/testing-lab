@@ -38,4 +38,56 @@ public class CollectionAssertionTest {
             assertThat(list).hasSizeBetween(3, 10);
         }
     }
+
+    @Nested
+    class contains_포함_검증 {
+
+        @Test
+        void contains_특정_요소_포함() {
+            List<String> list = List.of("apple", "banana", "cherry");
+            assertThat(list).contains("banana");
+        }
+
+        @Test
+        void contains_여러_요소_포함_순서_무관() {
+            List<String> list = List.of("apple", "banana", "cherry");
+            assertThat(list).contains("cherry", "apple");
+        }
+
+        @Test
+        void containsOnly_해당_요소들만_순서_무관() {
+            List<String> list = List.of("a", "b", "c");
+            assertThat(list).containsOnly("c", "a", "b");
+        }
+
+        @Test
+        void containsExactly_정확한_요소_정확한_순서() {
+            List<String> list = List.of("a", "b", "c");
+            assertThat(list).containsExactly("a", "b", "c");
+        }
+
+        @Test
+        void containsExactlyInAnyOrder_정확한_요소_순서_무관() {
+            List<String> list = List.of("a", "b", "c");
+            assertThat(list).containsExactlyInAnyOrder("c", "a", "b");
+        }
+
+        @Test
+        void doesNotContain_포함하지_않음() {
+            List<String> list = List.of("a", "b", "c");
+            assertThat(list).doesNotContain("d", "e");
+        }
+
+        @Test
+        void containsNull_null_포함() {
+            List<String> list = java.util.Arrays.asList("a", null, "b");
+            assertThat(list).containsNull();
+        }
+
+        @Test
+        void doesNotContainNull_null_미포함() {
+            List<String> list = List.of("a", "b");
+            assertThat(list).doesNotContainNull();
+        }
+    }
 }
