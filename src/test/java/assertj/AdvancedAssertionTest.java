@@ -3,6 +3,8 @@ package assertj;
 import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
@@ -75,6 +77,35 @@ public class AdvancedAssertionTest {
             assertThat(users).anySatisfy(user -> {
                 assertThat(user.age()).isGreaterThanOrEqualTo(18);
             });
+        }
+    }
+
+    @Nested
+    class 날짜_시간_검증 {
+
+        @Test
+        void LocalDate_비교() {
+            LocalDate today = LocalDate.now();
+            LocalDate yesterday = today.minusDays(1);
+
+            assertThat(today).isAfter(yesterday);
+            assertThat(today).isAfterOrEqualTo(today);
+            assertThat(yesterday).isBefore(today);
+            assertThat(yesterday).isBeforeOrEqualTo(yesterday);
+        }
+
+        @Test
+        void LocalDateTime_범위_검증() {
+            LocalDateTime now = LocalDateTime.now();
+
+            assertThat(now).isBetween(now.minusHours(1), now.plusHours(1));
+        }
+
+        @Test
+        void 날짜_필드별_검증() {
+            LocalDate date = LocalDate.of(2024, 12, 25);
+
+            assertThat(date).hasYear(2024).hasMonth(java.time.Month.DECEMBER).hasDayOfMonth(25);
         }
     }
 }
