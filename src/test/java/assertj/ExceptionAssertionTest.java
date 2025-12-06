@@ -62,4 +62,16 @@ public class ExceptionAssertionTest {
                     .hasMessageContaining("잘못된");
         }
     }
+
+    @Nested
+    class assertThatCode_예외_미발생_검증 {
+
+        @Test
+        void 예외가_발생하지_않으면_통과() {
+            assertThatCode(() -> {
+                        int result = 1 + 1;
+                    })
+                    .doesNotThrowAnyException();
+        }
+    }
 }
