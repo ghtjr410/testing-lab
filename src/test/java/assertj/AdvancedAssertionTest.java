@@ -108,4 +108,29 @@ public class AdvancedAssertionTest {
             assertThat(date).hasYear(2024).hasMonth(java.time.Month.DECEMBER).hasDayOfMonth(25);
         }
     }
+
+    @Nested
+    class Optional_검증 {
+
+        @Test
+        void 값이_있으면_통과() {
+            var optional = java.util.Optional.of("hello");
+
+            assertThat(optional).isPresent().hasValue("hello");
+        }
+
+        @Test
+        void 비어있으면_통과() {
+            var optional = java.util.Optional.empty();
+
+            assertThat(optional).isEmpty();
+        }
+
+        @Test
+        void 값_꺼내서_추가_검증() {
+            var optional = java.util.Optional.of("hello world");
+
+            assertThat(optional).isPresent().get().asString().startsWith("hello");
+        }
+    }
 }
