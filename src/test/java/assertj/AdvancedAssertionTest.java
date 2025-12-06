@@ -133,4 +133,29 @@ public class AdvancedAssertionTest {
             assertThat(optional).isPresent().get().asString().startsWith("hello");
         }
     }
+
+    @Nested
+    class 조건부_검증 {
+
+        @Test
+        void is_조건_검증() {
+            String str = "hello";
+
+            assertThat(str).is(new org.assertj.core.api.Condition<>(s -> s.length() > 3, "길이는 3보다 커야 한다"));
+            /**
+             * 실패 메세지
+             * Expecting:
+             *   "he"
+             * to be:
+             *   길이가 3보다 커야 한다
+             */
+        }
+
+        @Test
+        void matches_Predicate_검증() {
+            int number = 10;
+
+            assertThat(number).matches(n -> n % 2 == 0, "짝수");
+        }
+    }
 }
