@@ -42,4 +42,39 @@ public class AdvancedAssertionTest {
             });
         }
     }
+
+    @Nested
+    class satisfies_커스텀_검증 {
+
+        record User(String name, int age) {}
+
+        @Test
+        void 복잡한_조건_검증() {
+            User user = new User("철수", 25);
+
+            assertThat(user).satisfies(u -> {
+                assertThat(u.name()).isNotBlank();
+                assertThat(u.age()).isBetween(18, 65);
+            });
+        }
+
+        @Test
+        void 컬렉션_각_요소_검증() {
+            List<User> users = List.of(new User("철수", 20), new User("영희", 25));
+
+            assertThat(users).allSatisfy(user -> {
+                assertThat(user.name()).isNotBlank();
+                assertThat(user.age()).isPositive();
+            });
+        }
+
+        @Test
+        void 최소_하나_만족() {
+            List<User> users = List.of(new User("철수", 17), new User("영희", 25));
+
+            assertThat(users).anySatisfy(user -> {
+                assertThat(user.age()).isGreaterThanOrEqualTo(18);
+            });
+        }
+    }
 }
