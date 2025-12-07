@@ -44,4 +44,21 @@ public class LifeCycleTest {
         log.add("@Test2");
         assertThat(true).isTrue();
     }
+
+    @Nested
+    class BeforeAll_AfterAll {
+
+        /**
+         * @BeforeAll / @AfterAll
+         * - 전체 테스트 클래스에서 딱 한 번 실행
+         * - static 메서드여야 함 (인스턴스 생성 전에 실행되니까)
+         * - 용도: DB 연결, 테스트 컨테이너 시작, 공유 리소스 초기화
+         */
+        @Test
+        void static_메서드여야_하는_이유() {
+            // JUnit은 각 테스트마다 새 인스턴스 생성
+            // @BeforeAll은 인스턴스 생성 전에 실행되므로 static 필수
+            assertThat(true).isTrue();
+        }
+    }
 }
