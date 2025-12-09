@@ -116,4 +116,36 @@ public class LifeCycleTest {
             assertThat(count).isEqualTo(1);
         }
     }
+
+    @Nested
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    class TestInstance_PER_CLASS {
+
+        private int count = 0;
+
+        /**
+         * @TestInstance(PER_CLASS)
+         * - 테스트 클래스당 인스턴스 하나만 생성
+         * - @BeforeAll, @AfterAll에 static 안 붙여도 됨
+         * - 주의: 테스트 간 상태 공유됨 (격리 안 됨)
+         */
+        @BeforeAll
+        void static_아니어도_됨() {
+            count = 100;
+        }
+
+        @Test
+        void 상태_공유됨_1() {
+            count++;
+            assertThat(count).isEqualTo(101);
+        }
+
+        @Test
+        void 상태_공유됨_2() {
+            count++;
+            // 같은 인스턴스라서 이전 테스트 영향 받음
+            // 테스트 실행 순서에 따라 결과 달라질 수 있음
+            assertThat(count).isGreaterThan(100);
+        }
+    }
 }
