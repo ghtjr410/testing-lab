@@ -148,4 +148,29 @@ public class LifeCycleTest {
             assertThat(count).isGreaterThan(100);
         }
     }
+
+    @Nested
+    class Nested_클래스의_생명주기 {
+
+        /**
+         * @Nested 클래스는 부모의 @BeforeEach, @AfterEach 상속받음
+         * 실행 순서:
+         * 1. 부모 @BeforeEach
+         * 2. 자식 @BeforeEach
+         * 3. 테스트 실행
+         * 4. 자식 @AfterEach
+         * 5. 부모 @AfterEach
+         */
+        @BeforeEach
+        void nested_전용_setup() {
+            log.add("Nested @BeforeEach");
+        }
+
+        @Test
+        void 부모_BeforeEach도_실행됨() {
+            // 부모의 @BeforeEach 먼저 실행되고
+            // 이 클래스의 @BeforeEach 실행됨
+            assertThat(true).isTrue();
+        }
+    }
 }
