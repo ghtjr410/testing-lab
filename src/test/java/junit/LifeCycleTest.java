@@ -97,4 +97,23 @@ public class LifeCycleTest {
             assertThat(items).containsExactly("초기값");
         }
     }
+
+    @Nested
+    class 테스트_인스턴스_생성 {
+
+        private int count = 0;
+
+        @Test
+        void 테스트마다_새_인스턴스_생성됨_1() {
+            count++;
+            assertThat(count).isEqualTo(1);
+        }
+
+        @Test
+        void 테스트마다_새_인스턴스_생성됨_2() {
+            count++;
+            // 새 인스턴스라서 count는 다시 0부터 시작
+            assertThat(count).isEqualTo(1);
+        }
+    }
 }
