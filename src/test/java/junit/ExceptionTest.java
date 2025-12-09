@@ -40,4 +40,38 @@ public class ExceptionTest {
             });
         }
     }
+
+    @Nested
+    class assertTimeout_vs_assertTimeoutPreemptively {
+
+        /**
+         * assertTimeout
+         * - 작업 완료까지 기다린 후 시간 초과 여부 판단
+         * - 같은 스레드에서 실행
+         * - ThreadLocal, 트랜잭션 등 안전하게 동작
+         */
+        @Test
+        void assertTimeout은_같은_스레드() {
+            Thread testThread = Thread.currentThread();
+
+            assertTimeout(Duration.ofSeconds(1), () -> {
+                assertThat(Thread.currentThread()).isSameAs(testThread);
+            });
+        }
+
+        /**
+         * assertTimeoutPreemptively
+         * - 시간 초과 시 즉시 중단
+         * - 별도 스레드에서 실행
+         * - 주의: @Transactional 테스트에서 롤백 안 될 수 있음
+         */
+        @Test
+        void assertTimeoutPreemptively는_다른_스레드() {
+            Thread testThread = Thread.currentThread();
+
+            assertTimeoutPreemptively(Duration.ofSeconds(1), () -> {
+                assertThat(Thread.currentThread()).isNotSameAs(testThread);
+            });
+        }
+    }
 }
