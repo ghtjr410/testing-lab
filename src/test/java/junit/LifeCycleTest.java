@@ -61,4 +61,40 @@ public class LifeCycleTest {
             assertThat(true).isTrue();
         }
     }
+
+    @Nested
+    class BeforeEach_AfterEach {
+
+        private List<String> items;
+
+        @BeforeEach
+        void setUp() {
+            items = new ArrayList<>();
+            items.add("초기값");
+        }
+
+        @AfterEach
+        void tearDown() {
+            items.clear();
+        }
+
+        /**
+         * @BeforeEach / @AfterEach
+         * - 각 테스트 메서드 실행 전/후 매번 실행
+         * - 인스턴스 메서드
+         * - 용도: 테스트 격리, 객체 초기화, 정리
+         */
+        @Test
+        void 각_테스트는_독립적인_상태로_시작() {
+            items.add("추가");
+            assertThat(items).hasSize(2);
+        }
+
+        @Test
+        void 이전_테스트_영향_안받음() {
+            // 위 테스트에서 "추가" 했지만 여기선 초기 상태
+            assertThat(items).hasSize(1);
+            assertThat(items).containsExactly("초기값");
+        }
+    }
 }
