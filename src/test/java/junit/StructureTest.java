@@ -122,4 +122,55 @@ public class StructureTest {
             assertThat(true).isTrue();
         }
     }
+
+    @Nested
+    class Order_테스트_순서 {
+
+        /**
+         * 기본적으로 테스트 순서는 보장되지 않음
+         * @TestMethodOrder로 순서 지정 가능
+         *
+         * 주의: 테스트 간 의존성은 안티패턴
+         * 순서 지정은 통합 테스트 시나리오에서만 사용
+         */
+        @Nested
+        @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+        class OrderAnnotation_순서_지정 {
+
+            @Test
+            @Order(1)
+            void 첫번째() {
+                assertThat(true).isTrue();
+            }
+
+            @Test
+            @Order(2)
+            void 두번째() {
+                assertThat(true).isTrue();
+            }
+
+            @Test
+            @Order(3)
+            void 세번째() {
+                assertThat(true).isTrue();
+            }
+        }
+
+        @Nested
+        @TestMethodOrder(MethodOrderer.DisplayName.class)
+        class DisplayName_알파벳_순서 {
+
+            @Test
+            @DisplayName("A 테스트")
+            void z_메서드명과_무관하게_DisplayName_순서() {
+                assertThat(true).isTrue();
+            }
+
+            @Test
+            @DisplayName("B 테스트")
+            void a_메서드명과_무관하게_DisplayName_순서() {
+                assertThat(true).isTrue();
+            }
+        }
+    }
 }
