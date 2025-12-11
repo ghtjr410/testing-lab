@@ -77,4 +77,20 @@ public class StructureTest {
             }
         }
     }
+
+    @Nested
+    class Disabled_테스트_비활성화 {
+
+        @Test
+        @Disabled("버그 수정 전까지 비활성화")
+        void 비활성화된_테스트() {
+            // 실행되지 않음
+        }
+
+        @Test
+        @Disabled
+        void 이유_생략_가능() {
+            // 실행되지 않음
+        }
+    }
 }
