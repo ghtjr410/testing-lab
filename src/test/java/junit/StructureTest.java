@@ -93,4 +93,33 @@ public class StructureTest {
             // 실행되지 않음
         }
     }
+
+    @Nested
+    class Tag_테스트_분류 {
+
+        /**
+         * @Tag로 테스트 분류 후 선택 실행 가능
+         *
+         * Gradle: test { useJUnitPlatform { includeTags 'fast' } }
+         * Maven: -Dgroups="fast"
+         */
+        @Test
+        @Tag("fast")
+        void 빠른_테스트() {
+            assertThat(true).isTrue();
+        }
+
+        @Test
+        @Tag("slow")
+        void 느린_테스트() {
+            assertThat(true).isTrue();
+        }
+
+        @Test
+        @Tag("fast")
+        @Tag("unit")
+        void 여러_태그_가능() {
+            assertThat(true).isTrue();
+        }
+    }
 }
