@@ -44,4 +44,37 @@ public class StructureTest {
             }
         }
     }
+
+    @Nested
+    class Nested_테스트_그룹화 {
+
+        /**
+         * @Nested 장점:
+         * - 관련 테스트 논리적 그룹화
+         * - 계층 구조로 가독성 향상
+         * - 각 Nested 클래스별 @BeforeEach 가능
+         */
+        @Nested
+        class 성공_케이스 {
+
+            @Test
+            void 정상_입력시_성공() {
+                assertThat(true).isTrue();
+            }
+        }
+
+        @Nested
+        class 실패_케이스 {
+
+            @Test
+            void null_입력시_예외() {
+                assertThat(true).isTrue();
+            }
+
+            @Test
+            void 빈값_입력시_예외() {
+                assertThat(true).isTrue();
+            }
+        }
+    }
 }
