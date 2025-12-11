@@ -173,4 +173,26 @@ public class StructureTest {
             }
         }
     }
+
+    @Nested
+    class RepeatedTest_반복_테스트 {
+
+        @RepeatedTest(3)
+        void 세번_반복_실행() {
+            assertThat(true).isTrue();
+        }
+
+        @RepeatedTest(value = 3, name = "{displayName} - {currentRepetition}/{totalRepetitions}")
+        void 반복_횟수_표시_커스텀() {
+            assertThat(true).isTrue();
+        }
+
+        @RepeatedTest(3)
+        void RepetitionInfo_주입_가능(RepetitionInfo info) {
+            int current = info.getCurrentRepetition();
+            int total = info.getTotalRepetitions();
+
+            assertThat(current).isBetween(1, total);
+        }
+    }
 }
