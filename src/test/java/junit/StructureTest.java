@@ -22,4 +22,26 @@ public class StructureTest {
             assertThat(true).isTrue();
         }
     }
+
+    @Nested
+    class DisplayNameGeneration_자동_이름_생성 {
+
+        /**
+         * DisplayNameGenerator 종류:
+         * - Standard: 메서드명 그대로 (기본값)
+         * - Simple: 괄호 제거
+         * - ReplaceUnderscores: 언더스코어를 공백으로
+         * - IndicativeSentences: 클래스명 + 메서드명 조합
+         */
+        @Nested
+        @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+        class ReplaceUnderscores_적용시 {
+
+            @Test
+            void 언더스코어가_공백으로_변환된다() {
+                // 표시: "언더스코어가 공백으로 변환된다"
+                assertThat(true).isTrue();
+            }
+        }
+    }
 }
