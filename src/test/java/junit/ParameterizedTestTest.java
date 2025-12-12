@@ -7,6 +7,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.*;
 
@@ -264,6 +265,38 @@ public class ParameterizedTestTest {
         static Stream<Arguments> userWithExpectedProvider() {
             return Stream.of(
                     Arguments.of(new User("철수", 20, true), true), Arguments.of(new User("영희", 25, false), false));
+        }
+    }
+
+    @Nested
+    class ArgumentsSource_커스텀_Provider {
+
+        /**
+         * ArgumentsProvider 활용 예시
+         *
+         * - @ValueSource, @CsvSource 등 정적 데이터 공급 방식으로 표현하기 어려울 때 사용한다.
+         * - 테스트 입력값을 코드로 동적으로 생성하거나,
+         *   외부 파일/DB/JSON 등에서 읽어와 파라미터를 구성할 때 매우 유용하다.
+         * - JUnit이 Provider 클래스를 리플렉션으로 인스턴스화하므로 반드시 기본 생성자가 필요하다.
+         *
+         * 사용 시나리오:
+         * 1) 복잡한 객체 조합이 필요한 도메인 테스트
+         * 2) 다양한 케이스를 동적으로 생성하는 Property-based 테스트의 기초 형태
+         * 3) JSON/CSV 파일을 파싱하여 파라미터 제공
+         * 4) 비즈니스 규칙을 계산하여 여러 입력값을 자동 생성
+         *
+         */
+        @ParameterizedTest
+        @ArgumentsSource(CustomArgumentsProvider.class)
+        void 커스텀_Provider_사용(String input, int expected) {
+            assertThat(input.length()).isEqualTo(expected);
+        }
+
+        static class CustomArgumentsProvider implements ArgumentsProvider {
+            @Override
+            public Stream<? extends Arguments> provideArguments(ExtensionContext context) {
+                return Stream.of(Arguments.of("hello", 5), Arguments.of("world", 5), Arguments.of("test", 4));
+            }
         }
     }
 }
