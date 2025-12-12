@@ -2,6 +2,15 @@ package junit;
 
 import static org.assertj.core.api.Assertions.*;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.net.InetAddress;
+import java.net.URI;
+import java.net.URL;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.time.*;
 import java.util.List;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayNameGeneration;
@@ -297,6 +306,177 @@ public class ParameterizedTestTest {
             public Stream<? extends Arguments> provideArguments(ExtensionContext context) {
                 return Stream.of(Arguments.of("hello", 5), Arguments.of("world", 5), Arguments.of("test", 4));
             }
+        }
+    }
+
+    @Nested
+    class 암시적_타입_변환 {
+
+        // ──────────────────────── 기본형 & Wrapper ─────────────────────────
+        @ParameterizedTest
+        @ValueSource(strings = {"1", "20"})
+        void 문자열_to_Byte(byte value) {
+            assertThat(value).isPositive();
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = {"10", "300"})
+        void 문자열_to_Short(short value) {
+            assertThat(value).isPositive();
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = {"123", "456"})
+        void 문자열_to_Integer(int value) {
+            assertThat(value).isPositive();
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = {"1000", "9999"})
+        void 문자열_to_Long(long value) {
+            assertThat(value).isPositive();
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = {"1.23", "3.14"})
+        void 문자열_to_Float(float value) {
+            assertThat(value).isInstanceOf(Float.class);
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = {"1.23", "3.14"})
+        void 문자열_to_Double(double value) {
+            assertThat(value).isInstanceOf(Double.class);
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = {"true", "false"})
+        void 문자열_to_Boolean(boolean value) {
+            assertThat(value).isIn(true, false);
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = {"A", "Z"})
+        void 문자열_to_Character(char value) {
+            assertThat(value).isUpperCase();
+        }
+
+        // ───────────────────────────── Enum ────────────────────────────────
+        enum Status {
+            PENDING,
+            APPROVED
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = {"PENDING", "APPROVED"})
+        void 문자열_to_Enum(Status status) {
+            assertThat(status).isNotNull();
+        }
+
+        // ───────────────────────────── 날짜/시간 ─────────────────────────────
+        @ParameterizedTest
+        @ValueSource(strings = {"2024-01-01"})
+        void 문자열_to_LocalDate(LocalDate date) {
+            assertThat(date.getYear()).isEqualTo(2024);
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = {"10:15:30"})
+        void 문자열_to_LocalTime(LocalTime time) {
+            assertThat(time.getHour()).isEqualTo(10);
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = {"2024-01-01T10:20:30"})
+        void 문자열_to_LocalDateTime(LocalDateTime dt) {
+            assertThat(dt.getYear()).isEqualTo(2024);
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = {"2024-01-01T10:20:30+09:00"})
+        void 문자열_to_OffsetDateTime(OffsetDateTime odt) {
+            assertThat(odt.getOffset().getTotalSeconds()).isEqualTo(9 * 3600);
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = {"2024-01-01T10:20:30Z"})
+        void 문자열_to_Instant(Instant instant) {
+            assertThat(instant).isNotNull();
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = {"P2D"}) // ISO-8601 Duration
+        void 문자열_to_Duration(Duration duration) {
+            assertThat(duration.toDays()).isEqualTo(2);
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = {"P1Y2M"}) // Period 1년 2개월
+        void 문자열_to_Period(Period period) {
+            assertThat(period.getYears()).isEqualTo(1);
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = {"2024"})
+        void 문자열_to_Year(Year year) {
+            assertThat(year.getValue()).isEqualTo(2024);
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = {"2024-12"})
+        void 문자열_to_YearMonth(YearMonth ym) {
+            assertThat(ym.getMonthValue()).isEqualTo(12);
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = {"--12-25"}) // ISO MonthDay: 크리스마스
+        void 문자열_to_MonthDay(MonthDay md) {
+            assertThat(md.getDayOfMonth()).isEqualTo(25);
+        }
+
+        // ─────────────────────────── Big Numbers ───────────────────────────
+        @ParameterizedTest
+        @ValueSource(strings = {"123456789"})
+        void 문자열_to_BigInteger(BigInteger bi) {
+            assertThat(bi).isPositive();
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = {"12345.6789"})
+        void 문자열_to_BigDecimal(BigDecimal bd) {
+            assertThat(bd).isPositive();
+        }
+
+        // ─────────────────────── 파일/네트워크/URI 클래스 ───────────────────────
+        @ParameterizedTest
+        @ValueSource(strings = {"src/test/resources/test-csv-file-source.csv"})
+        void 문자열_to_Path(Path path) {
+            assertThat(path).exists();
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = {"https://google.com"})
+        void 문자열_to_URI(URI uri) {
+            assertThat(uri.getScheme()).isEqualTo("https");
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = {"https://google.com"})
+        void 문자열_to_URL(URL url) {
+            assertThat(url.getHost()).isEqualTo("google.com");
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = {"127.0.0.1"})
+        void 문자열_to_InetAddress(InetAddress address) {
+            assertThat(address).isNotNull();
+        }
+
+        // ───────────────────────────── Charset ───────────────────────────────
+        @ParameterizedTest
+        @ValueSource(strings = {"UTF-8", "ISO-8859-1"})
+        void 문자열_to_Charset(Charset charset) {
+            assertThat(charset).isIn(StandardCharsets.UTF_8, StandardCharsets.ISO_8859_1);
         }
     }
 }
