@@ -176,4 +176,21 @@ public class ParameterizedTestTest {
             assertThat(a + b).isEqualTo(expected);
         }
     }
+
+    @Nested
+    class CsvFileSource_외부_CSV_파일 {
+
+        /**
+         * src/test/resources/test-csv-file-source.csv 파일 필요:
+         * name,age
+         * 철수,20
+         * 영희,25
+         */
+        @ParameterizedTest
+        @CsvFileSource(resources = "/test-csv-file-source.csv", numLinesToSkip = 1)
+        void CSV_파일에서_데이터_읽기(String name, int age) {
+            assertThat(name).isNotBlank();
+            assertThat(age).isPositive();
+        }
+    }
 }
