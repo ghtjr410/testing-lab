@@ -17,7 +17,11 @@ import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.aggregator.AggregateWith;
+import org.junit.jupiter.params.aggregator.ArgumentsAccessor;
+import org.junit.jupiter.params.aggregator.ArgumentsAggregator;
 import org.junit.jupiter.params.converter.ConvertWith;
 import org.junit.jupiter.params.converter.SimpleArgumentConverter;
 import org.junit.jupiter.params.provider.*;
@@ -496,6 +500,37 @@ public class ParameterizedTestTest {
             protected Object convert(Object source, Class<?> targetType) {
                 String[] parts = source.toString().split("-");
                 return LocalDate.of(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]), 1);
+            }
+        }
+    }
+
+    @Nested
+    class ArgumentsAccessor_동적_접근 {
+
+        @ParameterizedTest
+        @CsvSource({"철수, 20, true", "영희, 25, false"})
+        void ArgumentsAccessor로_동적_접근(ArgumentsAccessor args) {
+            String name = args.getString(0);
+            int age = args.getInteger(1);
+            boolean active = args.getBoolean(2);
+
+            assertThat(name).isNotBlank();
+            assertThat(age).isPositive();
+        }
+
+        @ParameterizedTest
+        @CsvSource({"철수, 20, true", "영희, 25, false"})
+        void AggregateWith로_객체_변환(@AggregateWith(UserAggregator.class) User user) {
+            assertThat(user.name()).isNotBlank();
+            assertThat(user.age()).isPositive();
+        }
+
+        record User(String name, int age, boolean active) {}
+
+        static class UserAggregator implements ArgumentsAggregator {
+            @Override
+            public Object aggregateArguments(ArgumentsAccessor args, ParameterContext context) {
+                return new User(args.getString(0), args.getInteger(1), args.getBoolean(2));
             }
         }
     }
