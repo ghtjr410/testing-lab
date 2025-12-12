@@ -2,14 +2,12 @@ package junit;
 
 import static org.assertj.core.api.Assertions.*;
 
+import java.util.List;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EmptySource;
-import org.junit.jupiter.params.provider.NullAndEmptySource;
-import org.junit.jupiter.params.provider.NullSource;
-import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.params.provider.*;
 
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 public class ParameterizedTestTest {
@@ -68,7 +66,7 @@ public class ParameterizedTestTest {
 
         @ParameterizedTest
         @EmptySource
-        void 빈값_테스트_리스트(java.util.List<String> input) {
+        void 빈값_테스트_리스트(List<String> input) {
             assertThat(input).isEmpty();
         }
 
@@ -84,6 +82,47 @@ public class ParameterizedTestTest {
         void null_빈값_공백_모두_테스트(String input) {
             // null, "", "  ", "\t", "\n" 모두 테스트
             assertThat(input == null || input.isBlank()).isTrue();
+        }
+    }
+
+    @Nested
+    class EnumSource_Enum_값 {
+
+        enum Status {
+            PENDING,
+            APPROVED,
+            REJECTED,
+            CANCELLED
+        }
+
+        @ParameterizedTest
+        @EnumSource(Status.class)
+        void 모든_Enum_값_테스트(Status status) {
+            assertThat(status).isNotNull();
+        }
+
+        @ParameterizedTest
+        @EnumSource(
+                value = Status.class,
+                names = {"APPROVED", "REJECTED"})
+        void 특정_Enum만_테스트(Status status) {
+            assertThat(status).isIn(Status.APPROVED, Status.REJECTED);
+        }
+
+        @ParameterizedTest
+        @EnumSource(
+                value = Status.class,
+                names = {"CANCELLED"},
+                mode = EnumSource.Mode.EXCLUDE)
+        void 특정_Enum_제외(Status status) {
+            assertThat(status).isNotEqualTo(Status.CANCELLED);
+        }
+
+        @ParameterizedTest
+        @EnumSource(value = Status.class, names = ".*ED", mode = EnumSource.Mode.MATCH_ALL)
+        void 정규식_매칭(Status status) {
+            // APPROVED, REJECTED, CANCELLED (ED로 끝나는 것들)
+            assertThat(status.name()).endsWith("ED");
         }
     }
 }
