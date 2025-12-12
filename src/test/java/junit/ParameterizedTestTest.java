@@ -125,4 +125,55 @@ public class ParameterizedTestTest {
             assertThat(status.name()).endsWith("ED");
         }
     }
+
+    @Nested
+    class CsvSource_여러_파라미터 {
+
+        @ParameterizedTest
+        @CsvSource({"1, 2, 3", "10, 20, 30", "100, 200, 300"})
+        void 덧셈_테스트(int a, int b, int expected) {
+            assertThat(a + b).isEqualTo(expected);
+        }
+
+        @ParameterizedTest
+        @CsvSource({"hello, 5", "world, 5", "test, 4"})
+        void 문자열_길이_테스트(String input, int expectedLength) {
+            assertThat(input).hasSize(expectedLength);
+        }
+
+        @ParameterizedTest
+        @CsvSource(
+                value = {"apple | 1000", "banana | 2000", "cherry | 3000"},
+                delimiter = '|')
+        void 구분자_변경(String fruit, int price) {
+            assertThat(fruit).isNotBlank();
+            assertThat(price).isPositive();
+        }
+
+        @ParameterizedTest
+        @CsvSource({"'hello, world', 12", "'foo, bar', 8"})
+        void 쉼표_포함_문자열은_따옴표로_감싸기(String input, int length) {
+            assertThat(input).hasSize(length);
+        }
+
+        @ParameterizedTest
+        @CsvSource(
+                value = {
+                    "test, ",
+                },
+                nullValues = "")
+        void 빈값을_null로_처리(String first, String second) {
+            assertThat(second).isNull();
+        }
+
+        @ParameterizedTest
+        @CsvSource(textBlock = """
+            1, 2, 3
+            10, 20, 30
+            100, 200, 300
+            """)
+        void TextBlock_사용(int a, int b, int expected) {
+            assertThat(a + b).isEqualTo(expected);
+        }
+    }
 }
