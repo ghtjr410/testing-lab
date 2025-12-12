@@ -3,6 +3,7 @@ package junit;
 import static org.assertj.core.api.Assertions.*;
 
 import java.util.List;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Nested;
@@ -192,5 +193,49 @@ public class ParameterizedTestTest {
             assertThat(name).isNotBlank();
             assertThat(age).isPositive();
         }
+    }
+
+    @Nested
+    class MethodSource_메서드에서_데이터_제공 {
+
+        @ParameterizedTest
+        @MethodSource("stringProvider")
+        void 메서드에서_단일값_제공(String input) {
+            assertThat(input).isNotBlank();
+        }
+
+        static Stream<String> stringProvider() {
+            return Stream.of("hello", "world", "test");
+        }
+
+        @ParameterizedTest
+        @MethodSource("numberProvider")
+        void 메서드에서_여러값_제공(int a, int b, int expected) {
+            assertThat(a + b).isEqualTo(expected);
+        }
+
+        static Stream<Arguments> numberProvider() {
+            return Stream.of(Arguments.of(1, 2, 3), Arguments.of(10, 20, 30), Arguments.of(-1, 1, 0));
+        }
+
+        @ParameterizedTest
+        @MethodSource // 메서드명 생략시 테스트 메서드명과 동일한 메서드 찾음
+        void 메서드명_생략_가능(String input) {
+            assertThat(input).isNotBlank();
+        }
+
+        static Stream<String> 메서드명_생략_가능() {
+            return Stream.of("auto", "matched");
+        }
+
+        @ParameterizedTest
+        @MethodSource("junit.ParameterizedTestTest#externalProvider")
+        void 외부_클래스_메서드_참조(String input) {
+            assertThat(input).isNotBlank();
+        }
+    }
+
+    static Stream<String> externalProvider() {
+        return Stream.of("external", "data");
     }
 }
