@@ -238,4 +238,32 @@ public class ParameterizedTestTest {
     static Stream<String> externalProvider() {
         return Stream.of("external", "data");
     }
+
+    @Nested
+    class MethodSource_복잡한_객체 {
+
+        record User(String name, int age, boolean active) {}
+
+        @ParameterizedTest
+        @MethodSource("userProvider")
+        void 복잡한_객체_테스트(User user) {
+            assertThat(user.name()).isNotBlank();
+            assertThat(user.age()).isPositive();
+        }
+
+        static Stream<User> userProvider() {
+            return Stream.of(new User("철수", 20, true), new User("영희", 25, false), new User("민수", 30, true));
+        }
+
+        @ParameterizedTest
+        @MethodSource("userWithExpectedProvider")
+        void 객체와_기대값_함께(User user, boolean expectedActive) {
+            assertThat(user.active()).isEqualTo(expectedActive);
+        }
+
+        static Stream<Arguments> userWithExpectedProvider() {
+            return Stream.of(
+                    Arguments.of(new User("철수", 20, true), true), Arguments.of(new User("영희", 25, false), false));
+        }
+    }
 }
