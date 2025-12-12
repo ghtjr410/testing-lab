@@ -18,6 +18,8 @@ import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.converter.ConvertWith;
+import org.junit.jupiter.params.converter.SimpleArgumentConverter;
 import org.junit.jupiter.params.provider.*;
 
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
@@ -477,6 +479,24 @@ public class ParameterizedTestTest {
         @ValueSource(strings = {"UTF-8", "ISO-8859-1"})
         void 문자열_to_Charset(Charset charset) {
             assertThat(charset).isIn(StandardCharsets.UTF_8, StandardCharsets.ISO_8859_1);
+        }
+    }
+
+    @Nested
+    class 명시적_타입_변환_ConvertWith {
+
+        @ParameterizedTest
+        @ValueSource(strings = {"2024-01", "2024-06", "2024-12"})
+        void 커스텀_변환기_사용(@ConvertWith(YearMonthConverter.class) LocalDate date) {
+            assertThat(date.getDayOfMonth()).isEqualTo(1);
+        }
+
+        static class YearMonthConverter extends SimpleArgumentConverter {
+            @Override
+            protected Object convert(Object source, Class<?> targetType) {
+                String[] parts = source.toString().split("-");
+                return LocalDate.of(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]), 1);
+            }
         }
     }
 }
