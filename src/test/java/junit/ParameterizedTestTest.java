@@ -6,6 +6,9 @@ import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EmptySource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
@@ -45,6 +48,42 @@ public class ParameterizedTestTest {
         @ValueSource(booleans = {true, false})
         void boolean_테스트(boolean value) {
             assertThat(value).isIn(true, false);
+        }
+    }
+
+    @Nested
+    class NullSource_EmptySource_특수값 {
+
+        @ParameterizedTest
+        @NullSource
+        void null_테스트(String input) {
+            assertThat(input).isNull();
+        }
+
+        @ParameterizedTest
+        @EmptySource
+        void 빈값_테스트_문자열(String input) {
+            assertThat(input).isEmpty();
+        }
+
+        @ParameterizedTest
+        @EmptySource
+        void 빈값_테스트_리스트(java.util.List<String> input) {
+            assertThat(input).isEmpty();
+        }
+
+        @ParameterizedTest
+        @NullAndEmptySource
+        void null과_빈값_둘다(String input) {
+            assertThat(input == null || input.isEmpty()).isTrue();
+        }
+
+        @ParameterizedTest
+        @NullAndEmptySource
+        @ValueSource(strings = {"  ", "\t", "\n"})
+        void null_빈값_공백_모두_테스트(String input) {
+            // null, "", "  ", "\t", "\n" 모두 테스트
+            assertThat(input == null || input.isBlank()).isTrue();
         }
     }
 }
