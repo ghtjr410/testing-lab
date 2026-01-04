@@ -1,4 +1,4 @@
-package junit;
+package s01_junit;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -245,7 +245,7 @@ public class ParameterizedTestTest {
         }
 
         @ParameterizedTest
-        @MethodSource("junit.ParameterizedTestTest#externalProvider")
+        @MethodSource("s01_junit.ParameterizedTestTest#externalProvider")
         void 외부_클래스_메서드_참조(String input) {
             assertThat(input).isNotBlank();
         }

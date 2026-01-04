@@ -1,4 +1,4 @@
-package junit;
+package s01_junit;
 
 import static org.assertj.core.api.Assertions.*;
 

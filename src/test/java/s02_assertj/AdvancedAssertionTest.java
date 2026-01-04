@@ -1,4 +1,4 @@
-package assertj;
+package s02_assertj;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
