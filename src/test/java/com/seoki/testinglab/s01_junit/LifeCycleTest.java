@@ -1,4 +1,4 @@
-package s01_junit;
+package com.seoki.testinglab.s01_junit;
 
 import static org.assertj.core.api.Assertions.*;
 

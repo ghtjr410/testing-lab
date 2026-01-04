@@ -1,4 +1,4 @@
-package s02_assertj;
+package com.seoki.testinglab.s02_assertj;
 
 import static org.assertj.core.api.Assertions.*;
 
