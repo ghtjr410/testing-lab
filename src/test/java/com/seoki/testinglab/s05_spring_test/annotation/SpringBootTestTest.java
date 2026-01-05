@@ -6,6 +6,8 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.ApplicationContext;
 
 /**
@@ -59,6 +61,45 @@ public class SpringBootTestTest {
             // 대신 MockMvc를 사용해야 함
             assertThat(applicationContext.getEnvironment().getProperty("local.server.port"))
                     .isNull();
+        }
+    }
+
+    /**
+     * WebEnvironment.RANDOM_PORT
+     * - 실제 서블릿 컨테이너를 랜덤 포트로 시작
+     * - TestRestTemplate으로 실제 HTTP 요청 테스트 가능
+     * - 포트 충돌 방지
+     */
+    @Nested
+    @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+    class WebEnvironment_RANDOM_PORT {
+
+        @LocalServerPort
+        int port;
+
+        @Autowired
+        TestRestTemplate restTemplate;
+
+        @Test
+        void 랜덤_포트가_할당된다() {
+            assertThat(port).isGreaterThan(0);
+            System.out.println("할당된 포트: " + port);
+        }
+
+        @Test
+        void TestRestTemplate으로_실제_HTTP_요청이_가능하다() {
+            // 실제 서버가 떠있으므로 HTTP 요청 가능
+            assertThat(restTemplate).isNotNull();
+
+            // 실제 프로젝트에서는:
+            // String response = restTemplate.getForObject("/api/health", String.class);
+            // assertThat(response).isEqualTo("OK");
+        }
+
+        @Test
+        void LocalServerPort로_할당된_포트를_주입받는다() {
+            // @LocalServerPort는 RANDOM_PORT, DEFINED_PORT에서만 동작
+            assertThat(port).isBetween(1024, 65535);
         }
     }
 }
