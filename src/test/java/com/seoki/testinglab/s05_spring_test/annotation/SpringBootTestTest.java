@@ -141,4 +141,32 @@ public class SpringBootTestTest {
             assertThat(port).isEqualTo(9999);
         }
     }
+
+    /**
+     * properties 속성으로 테스트 전용 설정
+     */
+    @Nested
+    @SpringBootTest(
+            webEnvironment = WebEnvironment.NONE,
+            properties = {"spring.datasource.url=jdbc:h2:mem:testdb", "custom.feature.enabled=true"})
+    class properties_속성_활용 {
+
+        @Autowired
+        ApplicationContext applicationContext;
+
+        @Test
+        void 테스트_전용_프로퍼티가_적용된다() {
+            String featureEnabled = applicationContext.getEnvironment().getProperty("custom.feature.enabled");
+
+            assertThat(featureEnabled).isEqualTo("true");
+        }
+
+        @Test
+        void 인라인_프로퍼티가_파일_프로퍼티보다_우선한다() {
+            // @SpringBootTest의 properties는 application.properties보다 우선
+            String datasourceUrl = applicationContext.getEnvironment().getProperty("spring.datasource.url");
+
+            assertThat(datasourceUrl).isEqualTo("jdbc:h2:mem:testdb");
+        }
+    }
 }
