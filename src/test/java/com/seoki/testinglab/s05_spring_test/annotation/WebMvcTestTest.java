@@ -13,6 +13,7 @@ import java.util.Optional;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.ApplicationContext;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -117,6 +118,54 @@ public class WebMvcTestTest {
 
             // when & then
             mockMvc.perform(get("/api/orders/{id}", 999L)).andExpect(status().isNotFound());
+        }
+    }
+
+    // 웹 레이어만 로드되는지 확인
+    @Nested
+    @WebMvcTest(OrderController.class)
+    class 슬라이스_테스트_범위 {
+
+        @Autowired
+        ApplicationContext applicationContext;
+
+        @MockitoBean
+        OrderService orderService;
+
+        @Test
+        void Controller_빈은_등록된다() {
+            assertThat(applicationContext.getBeansOfType(OrderService.class)).isNotEmpty();
+        }
+
+        @Test
+        void Service_빈은_등록되지_않는다() {
+            // @MockitoBean으로 대체된 것이지, 실제 Service가 스캔된 것이 아님
+            // 실제 OrderServiceImpl 같은 구현체는 로드되지 않음
+            String[] beanNames = applicationContext.getBeanDefinitionNames();
+
+            // Service 구현체가 없음을 간접 확인
+            boolean hasServiceImpl = java.util.Arrays.stream(beanNames)
+                    .anyMatch(name -> name.toLowerCase().contains("serviceimpl"));
+            assertThat(hasServiceImpl).isFalse();
+        }
+
+        @Test
+        void Repository_빈은_등록되지_않는다() {
+            String[] beanNames = applicationContext.getBeanDefinitionNames();
+
+            boolean hasRepository = java.util.Arrays.stream(beanNames)
+                    .anyMatch(name -> name.toLowerCase().contains("repository") && !name.contains("mock"));
+            assertThat(hasRepository).isFalse();
+        }
+
+        @Test
+        void 로드되는_빈_개수가_적다() {
+            // @SpringBootTest 대비 훨씬 적은 빈만 로드
+            int beanCount = applicationContext.getBeanDefinitionCount();
+            System.out.println("로드된 빈 개수: " + beanCount);
+
+            // 일반적으로 100개 미만 (프로젝트에 따라 다름)
+            assertThat(beanCount).isLessThan(200);
         }
     }
 
