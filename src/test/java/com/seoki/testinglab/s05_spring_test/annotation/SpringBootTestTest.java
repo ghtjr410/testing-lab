@@ -191,6 +191,109 @@ public class SpringBootTestTest {
         }
     }
 
+    // 실무 안티패턴: @SpringBootTest 남용
+    @Nested
+    class 실무_안티패턴 {
+
+        @Test
+        @Disabled("개념 설명용 - 실행 불필요")
+        void 단위_테스트에_SpringBootTest_사용하지_말것() {
+            /*
+             * 안티패턴: 단순 서비스 로직에 @SpringBootTest 사용
+             *
+             * @SpringBootTest
+             * class OrderServiceTest {
+             *     @Autowired OrderService orderService;
+             *
+             *     @Test
+             *     void 주문_금액_계산() {
+             *         // 단순 계산 로직인데 전체 컨텍스트 로드?
+             *     }
+             * }
+             *
+             * 올바른 방법: 순수 단위 테스트
+             *
+             * class OrderServiceTest {
+             *     OrderService orderService = new OrderService(mock(OrderRepository.class));
+             *
+             *     @Test
+             *     void 주문_금액_계산() {
+             *         // 빠르고 격리된 테스트
+             *     }
+             * }
+             */
+        }
+
+        @Test
+        @Disabled("개념 설명용 - 실행 불필요")
+        void SpringBootTest_선택_기준() {
+            /*
+             * @SpringBootTest를 사용해야 하는 경우:
+             * 1. 여러 레이어를 통합하여 E2E 검증이 필요할 때
+             * 2. 실제 HTTP 요청/응답 테스트가 필요할 때 (RANDOM_PORT)
+             * 3. 전체 빈 구성이 올바른지 검증할 때
+             * 4. @Transactional 전파, 이벤트 발행 등 통합 동작 검증 시
+             *
+             * @SpringBootTest를 피해야 하는 경우:
+             * 1. 단일 클래스의 비즈니스 로직 테스트 → 단위 테스트
+             * 2. 컨트롤러만 테스트 → @WebMvcTest
+             * 3. JPA 레포지토리만 테스트 → @DataJpaTest
+             * 4. 외부 의존성 없는 순수 로직 → Mockito만 사용
+             */
+
+            /**
+             * ## 테스트 피라미드
+             *                     △
+             *                    /  \
+             *                   / E2E \          ← @SpringBootTest (RANDOM_PORT)
+             *                  /________\           몇 개만 (느림, 비쌈)
+             *                 /          \
+             *                / Integration \      ← @WebMvcTest, @DataJpaTest
+             *               /______________\        적당히 (중간)
+             *              /                \
+             *             /    Unit Tests    \    ← new + Mockito
+             *            /____________________\     많이 (빠름, 쌈)
+             *
+             * 실무 권장 비율:
+             * - Unit: 70%
+             * - Integration (슬라이스): 20%
+             * - E2E (@SpringBootTest): 10%
+             *
+             * ┌─────────────────────────────────────────────────────────┐
+             * │ 단위 테스트 관점: "이 메서드가 잘 동작하나?"                      │
+             * ├─────────────────────────────────────────────────────────┤
+             * │                                                         │
+             * │   @Test                                                 │
+             * │   void 주문_금액_계산() {                                   │
+             * │       assertThat(calculator.calculate(1000, 2))         │
+             * │               .isEqualTo(2000);                         │
+             * │   }                                                     │
+             * │                                                         │
+             * │   → 기술적 검증, 개발자 관점                                  │
+             * │                                                         │
+             * └─────────────────────────────────────────────────────────┘
+             *
+             * ┌─────────────────────────────────────────────────────────┐
+             * │ E2E 테스트 관점: "사용자가 주문을 완료할 수 있나?"                │
+             * ├─────────────────────────────────────────────────────────┤
+             * │                                                         │
+             * │   @Test                                                 │
+             * │   void 사용자가_상품을_주문하고_결제를_완료한다() {               │
+             * │       // 1. 로그인                                        │
+             * │       // 2. 상품 조회                                     │
+             * │       // 3. 장바구니 담기                                  │
+             * │       // 4. 주문 생성                                     │
+             * │       // 5. 결제 완료                                     │
+             * │       // 6. 주문 내역 확인                                  │
+             * │   }                                                     │
+             * │                                                         │
+             * │   → 비즈니스 시나리오, 사용자 관점                             │
+             * │                                                         │
+             * └─────────────────────────────────────────────────────────┘
+             */
+        }
+    }
+
     // 테스트용 헬퍼 클래스
     @org.springframework.context.annotation.Configuration
     static class TestConfig {
