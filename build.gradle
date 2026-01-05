@@ -32,6 +32,9 @@ dependencies {
     // Spring Boot
     implementation 'org.springframework.boot:spring-boot-starter-web'
 
+    // Validation
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
     // JUnit 5, AssertJ, Mockito 포함
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
