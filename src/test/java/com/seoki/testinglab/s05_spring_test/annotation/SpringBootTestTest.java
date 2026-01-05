@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.ApplicationContext;
+import org.springframework.test.context.TestPropertySource;
 
 /**
  * @SpringBootTest 학습 테스트
@@ -100,6 +101,44 @@ public class SpringBootTestTest {
         void LocalServerPort로_할당된_포트를_주입받는다() {
             // @LocalServerPort는 RANDOM_PORT, DEFINED_PORT에서만 동작
             assertThat(port).isBetween(1024, 65535);
+        }
+    }
+
+    /**
+     * WebEnvironment.DEFINED_PORT
+     * - application.properties의 server.port 사용
+     * - 포트 충돌 주의 필요
+     * - 실무에서는 RANDOM_PORT 권장
+     *
+     * 포트 설정 우선순위 (높은 순):
+     * 1. @TestPropertySource(properties = "server.port=...")
+     * 2. @SpringBootTest(properties = "server.port=...")
+     * 3. src/test/resources/application.yml (또는 .properties)
+     * 4. src/main/resources/application.yml (또는 .properties)
+     * 5. 기본값: 8080
+     *
+     * DEFINED_PORT가 필요한 경우:
+     * - OAuth 콜백 URL이 특정 포트로 고정된 경우 (예: localhost:8080/callback)
+     * - 외부 Mock 서버(Wiremock 등)가 특정 포트로 요청해야 하는 경우
+     * - 레거시 시스템이 하드코딩된 포트로만 통신 가능한 경우
+     * - Docker Compose 등 외부 인프라와 포트가 미리 약속된 경우
+     *
+     * 주의사항:
+     * - 동일 포트를 사용하는 테스트 병렬 실행 불가
+     * - 로컬에서 해당 포트가 이미 사용 중이면 테스트 실패
+     * - CI/CD 환경에서 포트 충돌 가능성 존재
+     */
+    @Nested
+    @SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
+    @TestPropertySource(properties = "server.port=9999")
+    class WebEnvironment_DEFINED_PORT {
+
+        @LocalServerPort
+        int port;
+
+        @Test
+        void 지정된_포트로_서버가_시작된다() {
+            assertThat(port).isEqualTo(9999);
         }
     }
 }
