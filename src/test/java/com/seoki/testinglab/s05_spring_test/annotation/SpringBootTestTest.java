@@ -169,4 +169,31 @@ public class SpringBootTestTest {
             assertThat(datasourceUrl).isEqualTo("jdbc:h2:mem:testdb");
         }
     }
+
+    /**
+     * classes 속성으로 특정 설정만 로드
+     * - 전체 컨텍스트 대신 필요한 설정만 로드하여 속도 개선
+     */
+    @Nested
+    @SpringBootTest(
+            webEnvironment = WebEnvironment.NONE,
+            classes = {TestConfig.class} // 특정 설정 클래스만 로드
+            )
+    class classes_속성_활용 {
+
+        @Autowired
+        ApplicationContext applicationContext;
+
+        @Test
+        void 지정한_설정_클래스만_로드된다() {
+            // TestConfig에서 정의한 빈만 존재
+            assertThat(applicationContext.getBeanDefinitionCount()).isLessThan(100);
+        }
+    }
+
+    // 테스트용 헬퍼 클래스
+    @org.springframework.context.annotation.Configuration
+    static class TestConfig {
+        // 필요한 빈만 정의
+    }
 }
