@@ -76,4 +76,69 @@ public class DataJpaTestTest {
             assertThat(members).isEmpty();
         }
     }
+
+    /**
+     * TestEntityManager 활용
+     * - EntityManager의 테스트 친화적 래퍼
+     */
+    @Nested
+    @DataJpaTest
+    class TestEntityManager_활용 {
+
+        @Autowired
+        TestEntityManager em;
+
+        @Autowired
+        MemberRepository memberRepository;
+
+        @Test
+        void persist로_직접_저장() {
+            // Repository 대신 직접 persist
+            Member member = new Member("직접저장", "direct@test.com");
+
+            Member persisted = em.persist(member);
+            em.flush();
+
+            assertThat(persisted.getId()).isNotNull();
+        }
+
+        @Test
+        void persistAndFlush로_저장과_플러시_동시에() {
+            Member member = new Member("플러시", "flush@test.com");
+
+            Member saved = em.persistAndFlush(member);
+
+            assertThat(saved.getId()).isNotNull();
+        }
+
+        @Test
+        void find로_직접_조회() {
+            Member member = em.persistAndFlush(new Member("찾기", "find@test.com"));
+            em.clear();
+
+            Member found = em.find(Member.class, member.getId());
+
+            assertThat(found.getName()).isEqualTo("찾기");
+        }
+
+        @Test
+        void clear로_영속성_컨텍스트_초기화() {
+            Member member = em.persistAndFlush(new Member("초기화", "clear@test.com"));
+
+            em.clear(); // 1차 캐시 비움
+
+            Member reloaded = em.find(Member.class, member.getId());
+            assertThat(reloaded).isNotSameAs(member); // 다른 인스턴스
+        }
+
+        @Test
+        void detach로_특정_엔티티만_분리() {
+            Member member = em.persistAndFlush(new Member("분리", "detach@test.com"));
+
+            em.detach(member);
+
+            // 분리된 엔티티는 영속성 컨텍스트에서 관리되지 않음
+            assertThat(em.getEntityManager().contains(member)).isFalse();
+        }
+    }
 }
