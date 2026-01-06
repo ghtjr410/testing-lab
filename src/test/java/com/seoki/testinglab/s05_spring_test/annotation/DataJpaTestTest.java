@@ -8,11 +8,13 @@ import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Service;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -244,6 +246,33 @@ public class DataJpaTestTest {
             Map<String, Object> services = applicationContext.getBeansWithAnnotation(Service.class);
 
             assertThat(services).isEmpty();
+        }
+    }
+
+    /**
+     * 실제 DB 사용 (내장 DB 대체)
+     * - Testcontainers와 함께 사용 권장
+     */
+    @Nested
+    @DataJpaTest
+    @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE) // 내장 DB 사용 안 함
+    @TestPropertySource(
+            properties = {
+                "spring.datasource.url=jdbc:h2:mem:realdb", // 실제로는 MySQL 등 사용
+                "spring.jpa.hibernate.ddl-auto=create-drop"
+            })
+    class 실제_DB_사용 {
+
+        @Autowired
+        MemberRepository memberRepository;
+
+        @Test
+        void 설정된_DB를_사용한다() {
+            // Replace.NONE: 자동 H2 구성 비활성화
+            // application.properties 또는 @TestPropertySource의 설정 사용
+            Member member = memberRepository.save(new Member("실제DB", "real@test.com"));
+
+            assertThat(member.getId()).isNotNull();
         }
     }
 }
