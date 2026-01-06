@@ -242,6 +242,74 @@ public class WebMvcTestTest {
         }
     }
 
+    /**
+     * 실무 안티패턴 및 Best Practice
+     */
+    @Nested
+    class 실무_Best_Practice {
+
+        @Test
+        @Disabled("개념 설명용")
+        void 안티패턴_Controller_미지정() {
+            /*
+             * 안티패턴: Controller 미지정
+             *
+             * @WebMvcTest  // 모든 Controller 스캔
+             * class OrderControllerTest { ... }
+             *
+             * 문제점:
+             * - 불필요한 Controller까지 로드
+             * - 테스트 속도 저하
+             * - 관련 없는 MockBean 주입 필요
+             *
+             * 올바른 방법:
+             *
+             * @WebMvcTest(OrderController.class)  // 특정 Controller만
+             * class OrderControllerTest { ... }
+             */
+        }
+
+        @Test
+        @Disabled("개념 설명용")
+        void Best_Practice_테스트_대상_명확화() {
+            /*
+             * @WebMvcTest로 검증해야 하는 것:
+             * HTTP 메서드, URL 매핑
+             * 요청 파라미터/바디 바인딩
+             * 입력값 유효성 검증 (@Valid)
+             * 응답 상태 코드
+             * 응답 바디 (JSON 직렬화)
+             * 예외 처리 (@ControllerAdvice)
+             *
+             * @WebMvcTest로 검증하면 안 되는 것:
+             * 비즈니스 로직 (Service 단위 테스트)
+             * 데이터베이스 연동 (@DataJpaTest)
+             * 외부 API 호출 (WireMock)
+             */
+        }
+
+        @Test
+        @Disabled("개념 설명용")
+        void WebMvcTest_vs_SpringBootTest_선택_기준() {
+            /*
+             * @WebMvcTest 사용:
+             * - Controller 단독 검증
+             * - 빠른 피드백 필요
+             * - Service 로직은 이미 검증됨
+             *
+             * @SpringBootTest + MockMvc 사용:
+             * - 전체 플로우 E2E 검증
+             * - 실제 Service, Repository 연동 필요
+             * - 통합 테스트 성격
+             *
+             * 권장 조합:
+             * 1. Service: 단위 테스트 (Mockito)
+             * 2. Controller: @WebMvcTest
+             * 3. E2E: @SpringBootTest + RANDOM_PORT
+             */
+        }
+    }
+
     // ========== 테스트용 클래스 ==========
 
     @RestController
