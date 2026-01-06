@@ -213,6 +213,35 @@ public class WebMvcTestTest {
         }
     }
 
+    /**
+     * 여러 Controller 동시 테스트
+     * - 실무에서는 단일 Controller 지정 권장 (테스트 격리)
+     */
+    @Nested
+    @WebMvcTest({OrderController.class, ProductController.class})
+    class 여러_Controller_테스트 {
+
+        @Autowired
+        MockMvc mockMvc;
+
+        @MockitoBean
+        OrderService orderService;
+
+        @MockitoBean
+        ProductService productService;
+
+        @Test
+        void 두_Controller_모두_테스트_가능() throws Exception {
+            // Order API
+            given(orderService.findAll()).willReturn(List.of());
+            mockMvc.perform(get("/api/orders")).andExpect(status().isOk());
+
+            // Product API
+            given(productService.findAll()).willReturn(List.of());
+            mockMvc.perform(get("/api/products")).andExpect(status().isOk());
+        }
+    }
+
     // ========== 테스트용 클래스 ==========
 
     @RestController
@@ -242,12 +271,32 @@ public class WebMvcTestTest {
         }
     }
 
+    @RestController
+    @RequestMapping("/api/products")
+    static class ProductController {
+
+        private final ProductService productService;
+
+        ProductController(ProductService productService) {
+            this.productService = productService;
+        }
+
+        @GetMapping
+        List<Product> findAll() {
+            return productService.findAll();
+        }
+    }
+
     interface OrderService {
         List<Order> findAll();
 
         Optional<Order> findById(Long id);
 
         Order create(OrderRequest request);
+    }
+
+    interface ProductService {
+        List<Product> findAll();
     }
 
     @Service
@@ -268,7 +317,17 @@ public class WebMvcTestTest {
         }
     }
 
+    @Service
+    static class StubProductService implements ProductService {
+        @Override
+        public List<Product> findAll() {
+            return List.of();
+        }
+    }
+
     record Order(Long id, String productName, int amount) {}
+
+    record Product(Long id, String name, int price) {}
 
     record OrderRequest(
             @jakarta.validation.constraints.NotBlank String productName,
