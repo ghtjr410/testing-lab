@@ -275,4 +275,42 @@ public class DataJpaTestTest {
             assertThat(member.getId()).isNotNull();
         }
     }
+
+    /**
+     * @DataJpaTest의 자동 설정
+     * 내부적으로 이것들이 포함되어 있음:
+     * @Transactional          ← 자동 트랜잭션 + 롤백
+     * @AutoConfigureTestDatabase  ← H2 자동 구성
+     * @AutoConfigureDataJpa   ← JPA 설정
+     */
+    @Nested
+    @DataJpaTest
+    @TestPropertySource(properties = {"spring.jpa.show-sql=true", "spring.jpa.properties.hibernate.format_sql=true"})
+    class 자동_설정_확인 {
+
+        @Autowired
+        TestEntityManager em;
+
+        @Autowired
+        MemberRepository memberRepository;
+
+        @Test
+        void 트랜잭션이_자동_적용된다() {
+            // @DataJpaTest는 @Transactional 포함
+            // 각 테스트 메서드가 트랜잭션 내에서 실행됨
+            Member member = memberRepository.save(new Member("트랜잭션", "tx@test.com"));
+
+            // 트랜잭션 내에서 영속성 컨텍스트 공유
+            assertThat(em.getEntityManager().contains(member)).isTrue();
+        }
+
+        @Test
+        void SQL_로그_확인_가능() {
+            // spring.jpa.show-sql=true 설정으로 콘솔에 SQL 출력
+            memberRepository.save(new Member("SQL확인", "sql@test.com"));
+            em.flush(); // INSERT 쿼리 확인 가능
+
+            memberRepository.findAll(); // SELECT 쿼리 확인 가능
+        }
+    }
 }
