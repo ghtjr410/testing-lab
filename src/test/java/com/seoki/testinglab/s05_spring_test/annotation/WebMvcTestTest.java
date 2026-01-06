@@ -96,12 +96,10 @@ public class WebMvcTestTest {
 
         @Test
         void POST_요청_테스트() throws Exception {
-            // given
             OrderRequest request = new OrderRequest("새 상품", 20000);
             Order savedOrder = new Order(1L, "새 상품", 20000);
             given(orderService.create(any(OrderRequest.class))).willReturn(savedOrder);
 
-            // when & then
             mockMvc.perform(post("/api/orders")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
@@ -113,10 +111,8 @@ public class WebMvcTestTest {
 
         @Test
         void 존재하지_않는_리소스_조회시_404() throws Exception {
-            // given
             given(orderService.findById(999L)).willReturn(Optional.empty());
 
-            // when & then
             mockMvc.perform(get("/api/orders/{id}", 999L)).andExpect(status().isNotFound());
         }
     }
@@ -166,6 +162,54 @@ public class WebMvcTestTest {
 
             // 일반적으로 100개 미만 (프로젝트에 따라 다름)
             assertThat(beanCount).isLessThan(200);
+        }
+    }
+
+    /**
+     * 요청 유효성 검증 테스트
+     *
+     * 검증 흐름:
+     * 1. POST 요청 → ObjectMapper가 DTO로 변환
+     * 2. @Valid가 Bean Validation 실행
+     * 3. 검증 실패 → MethodArgumentNotValidException
+     * 4. Spring이 400 Bad Request로 변환
+     * 5. Controller 메서드는 실행되지 않음
+     *
+     * 핵심 포인트:
+     * - @Valid 없으면 검증 안 됨 (빼먹기 쉬움)
+     * - 검증은 Controller 진입 전에 발생
+     */
+    @Nested
+    @WebMvcTest(OrderController.class)
+    class 요청_유효성_검증 {
+
+        @Autowired
+        MockMvc mockMvc;
+
+        @Autowired
+        ObjectMapper objectMapper;
+
+        @MockitoBean
+        OrderService orderService;
+
+        @Test
+        void 유효하지_않은_요청은_400_반환() throws Exception {
+            OrderRequest invalidRequest = new OrderRequest("", 10000);
+            mockMvc.perform(post("/api/orders")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(invalidRequest)))
+                    .andDo(print())
+                    .andExpect(status().isBadRequest());
+        }
+
+        @Test
+        void 음수_금액은_400_반환() throws Exception {
+            OrderRequest invalidRequest = new OrderRequest("상품", -1000);
+
+            mockMvc.perform(post("/api/orders")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(invalidRequest)))
+                    .andExpect(status().isBadRequest());
         }
     }
 
