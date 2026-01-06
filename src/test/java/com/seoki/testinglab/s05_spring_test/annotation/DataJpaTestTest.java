@@ -141,4 +141,58 @@ public class DataJpaTestTest {
             assertThat(em.getEntityManager().contains(member)).isFalse();
         }
     }
+
+    /**
+     * 쿼리 메서드 테스트
+     */
+    @Nested
+    @DataJpaTest
+    class 쿼리_메서드_테스트 {
+
+        @Autowired
+        TestEntityManager em;
+
+        @Autowired
+        MemberRepository memberRepository;
+
+        @BeforeEach
+        void setUp() {
+            em.persist(new Member("김철수", "kim@test.com"));
+            em.persist(new Member("이영희", "lee@test.com"));
+            em.persist(new Member("김영수", "kim2@test.com"));
+            em.flush();
+            em.clear();
+        }
+
+        @Test
+        void 메서드_이름으로_쿼리_생성() {
+            List<Member> kims = memberRepository.findByNameStartingWith("김");
+
+            assertThat(kims).hasSize(2);
+            assertThat(kims).extracting(Member::getName).containsExactlyInAnyOrder("김철수", "김영수");
+        }
+
+        @Test
+        void 이메일로_존재_여부_확인() {
+            boolean exists = memberRepository.existsByEmail("kim@test.com");
+            boolean notExists = memberRepository.existsByEmail("nobody@test.com");
+
+            assertThat(exists).isTrue();
+            assertThat(notExists).isFalse();
+        }
+
+        @Test
+        void JPQL_쿼리_테스트() {
+            List<Member> members = memberRepository.findByEmailDomain("test.com");
+
+            assertThat(members).hasSize(3);
+        }
+
+        @Test
+        void Native_쿼리_테스트() {
+            long count = memberRepository.countAllNative();
+
+            assertThat(count).isEqualTo(3);
+        }
+    }
 }
