@@ -4,11 +4,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import jakarta.persistence.*;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Controller;
+import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @DataJpaTest 학습 테스트
@@ -193,6 +198,52 @@ public class DataJpaTestTest {
             long count = memberRepository.countAllNative();
 
             assertThat(count).isEqualTo(3);
+        }
+    }
+
+    /**
+     * 슬라이스 테스트 범위 확인
+     */
+    @Nested
+    @DataJpaTest
+    class 슬라이스_테스트_범위 {
+
+        @Autowired
+        ApplicationContext applicationContext;
+
+        @Test
+        void JPA_관련_빈이_로드된다() {
+            // EntityManager 타입으로 정확히 확인
+            assertThat(applicationContext.getBeansOfType(EntityManager.class)).isNotEmpty();
+
+            // TestEntityManager도 확인
+            assertThat(applicationContext.getBeansOfType(TestEntityManager.class))
+                    .isNotEmpty();
+        }
+
+        @Test
+        void Repository_빈이_로드된다() {
+            // Repository 타입으로 확인
+            assertThat(applicationContext.getBeansOfType(MemberRepository.class))
+                    .isNotEmpty();
+        }
+
+        @Test
+        void Controller_빈은_로드되지_않는다() {
+            // @Controller 어노테이션으로 정확히 확인
+            Map<String, Object> controllers = applicationContext.getBeansWithAnnotation(Controller.class);
+            Map<String, Object> restControllers = applicationContext.getBeansWithAnnotation(RestController.class);
+
+            assertThat(controllers).isEmpty();
+            assertThat(restControllers).isEmpty();
+        }
+
+        @Test
+        void Service_빈은_로드되지_않는다() {
+            // @Service 어노테이션으로 정확히 확인
+            Map<String, Object> services = applicationContext.getBeansWithAnnotation(Service.class);
+
+            assertThat(services).isEmpty();
         }
     }
 }
