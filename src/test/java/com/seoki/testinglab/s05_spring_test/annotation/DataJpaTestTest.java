@@ -313,4 +313,76 @@ public class DataJpaTestTest {
             memberRepository.findAll(); // SELECT 쿼리 확인 가능
         }
     }
+
+    /**
+     * 실무 Best Practice
+     */
+    @Nested
+    class 실무_Best_Practice {
+
+        @Test
+        @Disabled("개념 설명용")
+        void flush_clear_패턴() {
+            /*
+             * Repository 테스트 시 필수 패턴:
+             *
+             * 1. 데이터 저장
+             * Member member = memberRepository.save(new Member(...));
+             *
+             * 2. flush() - 영속성 컨텍스트의 변경사항을 DB에 반영
+             * em.flush();
+             *
+             * 3. clear() - 영속성 컨텍스트 초기화 (1차 캐시 비움)
+             * em.clear();
+             *
+             * 4. 조회 - DB에서 실제로 조회
+             * Member found = memberRepository.findById(member.getId());
+             *
+             * 왜 필요한가?
+             * - flush 없이: 실제 쿼리가 나가지 않을 수 있음
+             * - clear 없이: 1차 캐시에서 조회하여 실제 DB 상태 검증 불가
+             */
+        }
+
+        @Test
+        @Disabled("개념 설명용")
+        void H2_vs_실제DB_차이_주의() {
+            /*
+             * H2와 MySQL의 차이점:
+             *
+             * 1. 대소문자 구분
+             *    - H2: 기본적으로 대소문자 구분 안 함
+             *    - MySQL: 설정에 따라 다름
+             *
+             * 2. SQL 문법 차이
+             *    - LIMIT, OFFSET 등 방언 차이
+             *    - 날짜/시간 함수 차이
+             *
+             * 3. 트랜잭션 격리 수준 기본값
+             *    - H2: READ_COMMITTED
+             *    - MySQL: REPEATABLE_READ
+             *
+             * 해결책:
+             * - Testcontainers로 실제 MySQL 컨테이너 사용
+             * - H2 MySQL 모드: jdbc:h2:mem:testdb;MODE=MySQL
+             */
+        }
+
+        @Test
+        @Disabled("개념 설명용")
+        void DataJpaTest_선택_기준() {
+            /*
+             * @DataJpaTest 사용 적합한 경우:
+             * - Repository 쿼리 메서드 검증
+             * - JPQL, Native Query 검증
+             * - Entity 연관관계 매핑 검증
+             * - Auditing (@CreatedDate 등) 검증
+             *
+             * @DataJpaTest가 부적합한 경우:
+             * - Service 레이어 트랜잭션 전파 테스트
+             * - 여러 Repository 조합 테스트 → @SpringBootTest
+             * - 실제 DB 특성(락, 격리수준) 테스트 → Testcontainers
+             */
+        }
+    }
 }
